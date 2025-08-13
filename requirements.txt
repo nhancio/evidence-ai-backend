@@ -1,0 +1,14 @@
+flask
+flask-cors
+streamlit>=1.28.0
+torch>=2.0.0
+transformers>=4.30.0
+numpy>=1.24.0
+datasets
+pandas
+accelerate>=0.26.0
+pathlib
+docx
+PyPDF2
+docx2txt
+werkzeug
