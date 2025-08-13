@@ -9,6 +9,10 @@ from io import BytesIO
 import PyPDF2
 import docx2txt
 from werkzeug.datastructures import FileStorage
+import os
+
+port = int(os.environ.get("PORT", 5000))
+
 
 
 
@@ -41,7 +45,7 @@ def extract_text_from_file(file: FileStorage) -> str:
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app,origins=["https://verdict-frontend-gamma.vercel.app"])
 
 @app.route('/api/analyze_sms', methods=['POST'])
 def analyze_sms():
@@ -128,4 +132,4 @@ def analyze_document():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
