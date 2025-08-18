@@ -1,0 +1,4 @@
+{
+  "buildCommand": "docker build -t verdict-app .",
+  "startCommand": "docker run -p 8000:8000 verdict-app"
+}

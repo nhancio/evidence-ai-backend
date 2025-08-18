@@ -11,6 +11,9 @@ docx
 PyPDF2
 docx2txt
 werkzeug
-torch==2.2.0+cpu --index-url https://download.pytorch.org/whl/cpu
+gunicorn==20.1.0
+
+
+
 
 
