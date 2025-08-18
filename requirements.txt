@@ -11,5 +11,4 @@ docx
 PyPDF2
 docx2txt
 werkzeug
---index-url https://download.pytorch.org/whl/cpu
-torch==2.2.0
+torch==2.2.0+cpu
