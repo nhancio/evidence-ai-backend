@@ -11,7 +11,7 @@ import docx2txt
 from werkzeug.datastructures import FileStorage
 import os
 
-port = int(os.environ.get("PORT", 5000))
+port = int(os.environ.get("PORT", 8000))
 
 
 
@@ -26,7 +26,6 @@ def load_model():
 tokenizer, model = load_model()
 
 def extract_text_from_file(file: FileStorage) -> str:
-    # content = file.read()
     ext = file.filename.lower()
     if ext.endswith(".txt"):
         return file.read().decode('utf-8')
@@ -34,7 +33,10 @@ def extract_text_from_file(file: FileStorage) -> str:
         return docx2txt.process(file)
     elif ext.endswith(".pdf"):
         text = []
-        with open(file, "rb") as f:
+        # Create a BytesIO object from the file content
+        file_content = file.read()
+        file.seek(0)  # Reset file pointer for future reads
+        with BytesIO(file_content) as f:
             reader = PyPDF2.PdfReader(f)
             for page in reader.pages:
                 text.append(page.extract_text() or "")
@@ -45,7 +47,7 @@ def extract_text_from_file(file: FileStorage) -> str:
 
 
 app = Flask(__name__)
-CORS(app,origins=["https://verdict-frontend-gamma.vercel.app"])
+CORS(app, origins=["https://verdict-frontend-gamma.vercel.app", "http://localhost:3000", "http://localhost:3001"])
 
 @app.route('/api/analyze_sms', methods=['POST'])
 def analyze_sms():
@@ -132,7 +134,7 @@ def analyze_document():
     })
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port)
 
     # app.run(host='0.0.0.0', port=port, debug=True)
