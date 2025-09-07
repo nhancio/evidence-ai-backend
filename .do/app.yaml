@@ -1,0 +1,19 @@
+name: verdict-ai-backend
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: nhancio/evidence-ai-backend
+    branch: main
+  run_command: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 1
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  health_check:
+    http_path: /api/health
+  envs:
+  - key: PYTHON_VERSION
+    value: "3.10.12"
+  - key: PORT
+    value: "8080"
