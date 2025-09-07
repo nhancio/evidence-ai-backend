@@ -8,14 +8,8 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# CORS configuration
-allowed_origins = [
-    "https://evidence-ai-frontend.vercel.app",  # Your actual Vercel URL
-    "http://localhost:3000",
-    "http://localhost:3001", 
-    "http://localhost:3002"
-]
-CORS(app, origins=allowed_origins)
+# CORS configuration - Allow all origins for now
+CORS(app, origins=["*"])
 
 # Global variables
 MODEL = None
