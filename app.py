@@ -57,13 +57,27 @@ allowed_origins = [
 
 CORS(app, origins=allowed_origins)
 
+@app.route('/', methods=['GET'])
+def root():
+    return jsonify({
+        "message": "Verdict AI Backend is running",
+        "status": "ok"
+    })
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    return jsonify({
-        "status": "healthy",
-        "model": MODEL_NAME,
-        "message": "Verdict AI Backend is running"
-    })
+    try:
+        return jsonify({
+            "status": "healthy",
+            "model": MODEL_NAME,
+            "message": "Verdict AI Backend is running",
+            "timestamp": str(pd.Timestamp.now())
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 @app.route('/api/analyze_sms', methods=['POST'])
 def analyze_sms():
