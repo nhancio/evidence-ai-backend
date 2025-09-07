@@ -47,7 +47,25 @@ def extract_text_from_file(file: FileStorage) -> str:
 
 
 app = Flask(__name__)
-CORS(app, origins=["https://verdict-frontend-gamma.vercel.app", "http://localhost:3000", "http://localhost:3001"])
+# CORS configuration for production and development
+allowed_origins = [
+    "https://Evidence-frontend-gamma.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:3001", 
+    "http://localhost:3002",
+    "https://verdict-ai-frontend.vercel.app",  # Add your Vercel URL here
+    "https://verdict-ai.netlify.app"  # Add your Netlify URL here
+]
+
+CORS(app, origins=allowed_origins)
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({
+        "status": "healthy",
+        "model": MODEL_NAME,
+        "message": "Verdict AI Backend is running"
+    })
 
 @app.route('/api/analyze_sms', methods=['POST'])
 def analyze_sms():
