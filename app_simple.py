@@ -21,7 +21,7 @@ def load_model():
         api_key = os.environ.get('GOOGLE_API_KEY')
         if api_key:
             genai.configure(api_key=api_key)
-            MODEL = genai.GenerativeModel('gemini-pro')
+            MODEL = genai.GenerativeModel('gemini-1.5-flash')
             print("✅ Gemini model loaded successfully")
         else:
             print("⚠️ No Google API key found, summarization will use fallback")
