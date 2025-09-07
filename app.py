@@ -10,6 +10,8 @@ import PyPDF2
 import docx2txt
 from werkzeug.datastructures import FileStorage
 import os
+import tempfile
+from document_summarizer import summarizer
 
 port = int(os.environ.get("PORT", 8000))
 
@@ -162,6 +164,42 @@ def analyze_document():
         "cd": sentiment_score,
         "emotions": emotions
     })
+
+@app.route('/api/summarize_document', methods=['POST'])
+def summarize_document():
+    try:
+        file = request.files['file']
+        question = request.form.get('question', 'Summarize this document')
+        
+        # Save file temporarily
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file.filename.split('.')[-1]}") as tmp_file:
+            file.save(tmp_file.name)
+            
+            # Get Google API key from environment or request
+            google_api_key = os.environ.get('GOOGLE_API_KEY')
+            if not google_api_key:
+                google_api_key = request.form.get('google_api_key')
+            
+            if google_api_key:
+                summarizer.set_google_api_key(google_api_key)
+            
+            # Summarize document
+            summary = summarizer.summarize_document(tmp_file.name, question)
+            
+            # Clean up temporary file
+            os.unlink(tmp_file.name)
+            
+            return jsonify({
+                "summary": summary,
+                "question": question,
+                "status": "success"
+            })
+            
+    except Exception as e:
+        return jsonify({
+            "error": f"Error summarizing document: {str(e)}",
+            "status": "error"
+        }), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8000))
