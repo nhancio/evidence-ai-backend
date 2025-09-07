@@ -1,0 +1,15 @@
+[Unit]
+Description=Gunicorn instance to serve Verdict AI Backend
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/verdict-ai-backend
+Environment="PATH=/var/www/verdict-ai-backend/venv/bin"
+ExecStart=/var/www/verdict-ai-backend/venv/bin/gunicorn --config gunicorn.conf.py wsgi:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
