@@ -7,7 +7,7 @@ User=www-data
 Group=www-data
 WorkingDirectory=/var/www/verdict-ai-backend
 Environment="PATH=/var/www/verdict-ai-backend/venv/bin"
-ExecStart=/var/www/verdict-ai-backend/venv/bin/gunicorn --config gunicorn.conf.py wsgi:app
+ExecStart=/var/www/verdict-ai-backend/venv/bin/gunicorn --config gunicorn.conf.py app_simple:app
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=always
 

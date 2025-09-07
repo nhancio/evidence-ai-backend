@@ -66,23 +66,9 @@ print_status "Installing Python dependencies..."
 pip install --upgrade pip
 pip install --upgrade setuptools wheel
 
-# Install packages one by one to avoid conflicts
-print_status "Installing core packages..."
-pip install flask==2.3.3
-pip install flask-cors==4.0.0
-pip install gunicorn==20.1.0
-pip install werkzeug==2.3.7
-
-print_status "Installing ML packages..."
-pip install numpy==1.24.3
-pip install pandas==2.0.3
-pip install torch==2.2.0
-pip install transformers==4.30.2
-
-print_status "Installing document processing packages..."
-pip install PyPDF2==3.0.1
-pip install docx2txt==0.8
-pip install google-generativeai==0.3.2
+# Install packages from requirements.txt
+print_status "Installing packages from requirements.txt..."
+pip install -r requirements.txt
 
 # Create necessary directories
 print_status "Creating necessary directories..."
