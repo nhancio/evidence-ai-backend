@@ -14,6 +14,9 @@ CORS(app, origins=["*"])
 # Global variables
 MODEL = None
 
+# Load model when app starts
+load_model()
+
 def load_model():
     """Load the Gemini model"""
     global MODEL
