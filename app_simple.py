@@ -14,9 +14,6 @@ CORS(app, origins=["*"])
 # Global variables
 MODEL = None
 
-# Load model when app starts
-load_model()
-
 def load_model():
     """Load the Gemini model"""
     global MODEL
@@ -30,6 +27,9 @@ def load_model():
             print("⚠️ No Google API key found, summarization will use fallback")
     except Exception as e:
         print(f"❌ Error loading model: {e}")
+
+# Load model when app starts
+load_model()
 
 def extract_text_from_file(file_path):
     """Extract text from various file types"""
