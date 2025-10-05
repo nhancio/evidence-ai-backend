@@ -9,7 +9,7 @@ class DocumentSummarizer:
         self.api_key = None
         
     def set_google_api_key(self, api_key: str):
-        """Set OpenAI API key"""
+        """Set Hugging Face API key"""
         self.api_key = api_key
     
     def extract_text_from_file(self, file_path: str) -> str:
@@ -33,7 +33,7 @@ class DocumentSummarizer:
             return f"Error reading file: {str(e)}"
     
     def summarize_document(self, file_path: str, question: str = "Summarize this document") -> str:
-        """Summarize a document using OpenAI"""
+        """Summarize a document using Hugging Face LLM with proper system prompt"""
         try:
             # Extract text from document
             text_content = self.extract_text_from_file(file_path)
@@ -41,51 +41,57 @@ class DocumentSummarizer:
             if not text_content or text_content.startswith("Error"):
                 return text_content
             
-            # Truncate text if too long (GPT-3.5 has 16k context)
-            if len(text_content) > 12000:
-                text_content = text_content[:12000] + "..."
+            # Truncate text if too long (handle ~8000 characters for better context)
+            if len(text_content) > 8000:
+                text_content = text_content[:8000]
             
-            # Create prompt
-            prompt = f"""Please provide a comprehensive summary of the following document:
-
-{text_content}
-
-Please provide a clear, well-structured summary that covers the main points, key concepts, and important details from the document."""
-
-            # Generate summary using OpenAI
+            # Generate summary using Hugging Face BART - raw API
             if self.api_key:
                 try:
-                    response = requests.post(
-                        url="https://api.openai.com/v1/chat/completions",
-                        headers={
-                            "Authorization": f"Bearer {self.api_key}",
-                            "Content-Type": "application/json"
-                        },
-                        json={
-                            "model": "gpt-3.5-turbo",
-                            "messages": [
-                                {
-                                    "role": "system",
-                                    "content": "You are a helpful assistant that provides clear, concise, and well-structured document summaries."
-                                },
-                                {
-                                    "role": "user",
-                                    "content": prompt
-                                }
-                            ],
-                            "temperature": 0.7,
-                            "max_tokens": 1000
+                    # Using BART Large CNN - optimized for summarization
+                    API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
+                    headers = {
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    
+                    # Raw BART API - just pass the document content
+                    payload = {
+                        "inputs": text_content,
+                        "parameters": {
+                            "max_length": 250,
+                            "min_length": 80,
+                            "do_sample": False
                         }
-                    )
+                    }
+                    
+                    response = requests.post(API_URL, headers=headers, json=payload, timeout=60)
                     
                     if response.status_code == 200:
                         result = response.json()
-                        return result['choices'][0]['message']['content']
+                        
+                        # BART returns [{'summary_text': '...'}]
+                        if isinstance(result, list) and len(result) > 0:
+                            summary = result[0].get('summary_text', '')
+                            if summary:
+                                return summary.strip()
+                        
+                        # Fallback for dict response
+                        if isinstance(result, dict):
+                            summary = result.get('summary_text', '')
+                            if summary:
+                                return summary.strip()
+                        
+                        return "Could not extract summary from response"
                     else:
-                        return f"Error from OpenAI: {response.status_code} - {response.text}"
+                        error_msg = response.text
+                        # Check if model is loading
+                        if 'loading' in error_msg.lower() or 'estimated_time' in error_msg.lower():
+                            return "⏳ Model is loading (first-time use). Please try again in 20-30 seconds."
+                        return f"Error from Hugging Face: {response.status_code} - {error_msg}"
                         
                 except Exception as e:
-                    return f"Error generating summary with OpenAI: {str(e)}"
+                    return f"Error generating summary: {str(e)}"
             else:
                 # Fallback to simple summarization
                 return self._simple_summarize(text_content)

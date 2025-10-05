@@ -179,14 +179,14 @@ def summarize_document():
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file.filename.split('.')[-1]}") as tmp_file:
             file.save(tmp_file.name)
             
-            # Get OpenAI API key from environment (always use from .env)
-            openai_api_key = os.environ.get('OPENAI_API_KEY')
+            # Get Hugging Face API key from environment (always use from .env)
+            hf_api_key = os.environ.get('HF_TOKEN')
             
-            if openai_api_key:
-                summarizer.set_google_api_key(openai_api_key)
+            if hf_api_key:
+                summarizer.set_google_api_key(hf_api_key)
             else:
                 return jsonify({
-                    "error": "OpenAI API key not configured on server",
+                    "error": "Hugging Face API key not configured on server",
                     "status": "error"
                 }), 500
             
