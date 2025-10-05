@@ -82,7 +82,7 @@ def summarize_with_gemini(text):
 @app.route('/', methods=['GET'])
 def root():
     return jsonify({
-        "message": "Verdict AI Backend is running",
+        "message": "EvidenceAI Backend is running",
         "status": "ok"
     })
 
@@ -91,7 +91,7 @@ def health_check():
     try:
         return jsonify({
             "status": "healthy",
-            "message": "Verdict AI Backend is running",
+            "message": "EvidenceAI Backend is running",
             "model_loaded": MODEL is not None
         }), 200
     except Exception as e:

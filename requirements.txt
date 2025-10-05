@@ -3,7 +3,9 @@ flask-cors
 gunicorn
 PyPDF2
 docx2txt
-google-generativeai
+requests
+pandas
+python-dotenv
 
 
 

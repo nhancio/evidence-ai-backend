@@ -12,6 +12,10 @@ from werkzeug.datastructures import FileStorage
 import os
 import tempfile
 from document_summarizer import summarizer
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 port = int(os.environ.get("PORT", 8000))
 
@@ -62,7 +66,7 @@ CORS(app, origins=allowed_origins)
 @app.route('/', methods=['GET'])
 def root():
     return jsonify({
-        "message": "Verdict AI Backend is running",
+        "message": "EvidenceAI Backend is running",
         "status": "ok"
     })
 
@@ -72,7 +76,7 @@ def health_check():
         return jsonify({
             "status": "healthy",
             "model": MODEL_NAME,
-            "message": "Verdict AI Backend is running",
+            "message": "EvidenceAI Backend is running",
             "timestamp": str(pd.Timestamp.now())
         }), 200
     except Exception as e:
@@ -175,13 +179,16 @@ def summarize_document():
         with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file.filename.split('.')[-1]}") as tmp_file:
             file.save(tmp_file.name)
             
-            # Get Google API key from environment or request
-            google_api_key = os.environ.get('GOOGLE_API_KEY')
-            if not google_api_key:
-                google_api_key = request.form.get('google_api_key')
+            # Get OpenAI API key from environment (always use from .env)
+            openai_api_key = os.environ.get('OPENAI_API_KEY')
             
-            if google_api_key:
-                summarizer.set_google_api_key(google_api_key)
+            if openai_api_key:
+                summarizer.set_google_api_key(openai_api_key)
+            else:
+                return jsonify({
+                    "error": "OpenAI API key not configured on server",
+                    "status": "error"
+                }), 500
             
             # Summarize document
             summary = summarizer.summarize_document(tmp_file.name, question)

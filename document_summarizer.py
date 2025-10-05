@@ -2,20 +2,15 @@ import os
 import tempfile
 import PyPDF2
 import docx2txt
-import google.generativeai as genai
+import requests
 
 class DocumentSummarizer:
     def __init__(self):
-        self.model = None
+        self.api_key = None
         
     def set_google_api_key(self, api_key: str):
-        """Set Google API key for Gemini"""
-        try:
-            genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-pro')
-        except Exception as e:
-            print(f"Error setting up Gemini: {e}")
-            self.model = None
+        """Set OpenAI API key"""
+        self.api_key = api_key
     
     def extract_text_from_file(self, file_path: str) -> str:
         """Extract text from various file types"""
@@ -38,7 +33,7 @@ class DocumentSummarizer:
             return f"Error reading file: {str(e)}"
     
     def summarize_document(self, file_path: str, question: str = "Summarize this document") -> str:
-        """Summarize a document using Gemini"""
+        """Summarize a document using OpenAI"""
         try:
             # Extract text from document
             text_content = self.extract_text_from_file(file_path)
@@ -46,9 +41,9 @@ class DocumentSummarizer:
             if not text_content or text_content.startswith("Error"):
                 return text_content
             
-            # Truncate text if too long (Gemini has token limits)
-            if len(text_content) > 10000:
-                text_content = text_content[:10000] + "..."
+            # Truncate text if too long (GPT-3.5 has 16k context)
+            if len(text_content) > 12000:
+                text_content = text_content[:12000] + "..."
             
             # Create prompt
             prompt = f"""Please provide a comprehensive summary of the following document:
@@ -57,13 +52,40 @@ class DocumentSummarizer:
 
 Please provide a clear, well-structured summary that covers the main points, key concepts, and important details from the document."""
 
-            # Generate summary using Gemini
-            if self.model:
+            # Generate summary using OpenAI
+            if self.api_key:
                 try:
-                    response = self.model.generate_content(prompt)
-                    return response.text
+                    response = requests.post(
+                        url="https://api.openai.com/v1/chat/completions",
+                        headers={
+                            "Authorization": f"Bearer {self.api_key}",
+                            "Content-Type": "application/json"
+                        },
+                        json={
+                            "model": "gpt-3.5-turbo",
+                            "messages": [
+                                {
+                                    "role": "system",
+                                    "content": "You are a helpful assistant that provides clear, concise, and well-structured document summaries."
+                                },
+                                {
+                                    "role": "user",
+                                    "content": prompt
+                                }
+                            ],
+                            "temperature": 0.7,
+                            "max_tokens": 1000
+                        }
+                    )
+                    
+                    if response.status_code == 200:
+                        result = response.json()
+                        return result['choices'][0]['message']['content']
+                    else:
+                        return f"Error from OpenAI: {response.status_code} - {response.text}"
+                        
                 except Exception as e:
-                    return f"Error generating summary with Gemini: {str(e)}"
+                    return f"Error generating summary with OpenAI: {str(e)}"
             else:
                 # Fallback to simple summarization
                 return self._simple_summarize(text_content)
