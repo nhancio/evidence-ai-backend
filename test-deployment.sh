@@ -4,7 +4,7 @@ echo "🧪 Testing Verdict AI Backend Deployment..."
 
 # Test health endpoint
 echo "Testing health endpoint..."
-HEALTH_RESPONSE=$(curl -s http://localhost:8080/api/health)
+HEALTH_RESPONSE=$(curl -s https://postpituitary-patria-pettishly.ngrok-free.dev/api/health)
 if [[ $HEALTH_RESPONSE == *"healthy"* ]]; then
     echo "✅ Health check passed!"
     echo "Response: $HEALTH_RESPONSE"
@@ -15,7 +15,7 @@ fi
 
 # Test root endpoint
 echo "Testing root endpoint..."
-ROOT_RESPONSE=$(curl -s http://localhost:8080/)
+ROOT_RESPONSE=$(curl -s https://postpituitary-patria-pettishly.ngrok-free.dev)
 if [[ $ROOT_RESPONSE == *"Verdict AI Backend"* ]]; then
     echo "✅ Root endpoint working!"
     echo "Response: $ROOT_RESPONSE"

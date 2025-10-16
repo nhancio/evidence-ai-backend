@@ -2,7 +2,7 @@
 
 echo "🧪 Testing Verdict AI Backend API Endpoints..."
 
-BASE_URL="http://localhost:8080"
+BASE_URL="https://postpituitary-patria-pettishly.ngrok-free.dev"
 
 # Test health endpoint
 echo "1. Testing health endpoint..."

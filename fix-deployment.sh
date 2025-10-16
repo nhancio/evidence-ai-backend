@@ -31,7 +31,7 @@ sleep 30
 
 # Test the application
 echo "Testing application..."
-curl -f http://localhost:8080/api/health && echo "✅ Health check passed!" || echo "❌ Health check failed!"
+curl -f https://postpituitary-patria-pettishly.ngrok-free.dev/api/health && echo "✅ Health check passed!" || echo "❌ Health check failed!"
 
 echo "🎉 Deployment fixed! Your app is available at:"
 echo "  http://$(curl -s ifconfig.me):8080/api/health"
